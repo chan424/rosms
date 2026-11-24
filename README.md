@@ -17,7 +17,7 @@ secure place.
 | # | Module | Status |
 |---|--------|--------|
 | 1 | **Library Management**: catalogue (accession no., title, author, ISBN, category, copies, rack), members, issue/return, due dates, renewals, fines, reservations with queue, overdue list, history, dashboard, Excel import, Excel/PDF export, circulation rules | ✅ Complete |
-| 2 | **Hospital Stock**: stock engine plus **batch numbers and expiry dates** (first-expiry-first-out issue, expiry alerts) | ✅ Working |
+| 2 | **Hospital Stock & Dispensary**: opening stock loaded from the college medicine sheet (111 items: Tablets / Ointments, Drops & Syrups / Injections & Surgical Items). **Issue medicines** to a student (ID like `O234747`), staff, faculty or other: several medicines per visit, quantity, optional complaint/diagnosis, automatic date/time and issued-by. **Receive** new stock with quantity, batch, expiry, supplier and indent/invoice ref, and received-on date. First-expiry-first-out batches, write-offs for expired or damaged stock, per-medicine history, **daily issue register**, **search by student ID** to see everything given to them, out-of-stock / low-stock / expiry alerts, Excel/PDF export, and in-app import of the stock sheet | ✅ Complete |
 | 3 | **Central Stock**: Central Stores. Departments transfer to and from it | ✅ Working |
 | 4 | **Department & office stock**: CSE, ECE, EEE, ME, CE, Civil Works, Electrical Works, Mechanical Works, IT Infra, FO, DSW, EBS. All share one stock engine: items, stock in/out, physical-count adjustment, append-only ledger, transfers with accept/reject, low-stock alerts, import/export | ✅ Working |
 | 5 | **Student Campus Status & Outpass**: in/out status, issue outpass (issued by, issued at, reason, type, destination, expected return), mark returned (actual return, **late flag**), cancel, status board, register, student import. Students see their own records | ✅ Working |
@@ -33,6 +33,7 @@ entry there, add its id to `stockModules()` in `firestore.rules`, and add it to 
 | **Super admins**: `ao@`, `director@`, `ncs@`, `da@rguktong.ac.in` | Google | Everything, plus Administration (users, staff logins, module owners) and the full audit log |
 | **Module owners**: HoD / coordinator role inboxes (`hodcse@`, `hodece@`, `hodeee@`, `hodmech@`, `hodcivil@`, `hodlib@`, `cw_coord@`, `ew_coord@`, `mw_coord@`, `itinfra@`, `fo@`, `dsw@`, `ebs@`) | Google | View and modify **their own module only**, plus that module's settings and audit log. Admins can change owners in-app (Administration → Module owners). Central Stores, Hospital and Outpass have no owner until an admin assigns one |
 | **HoD / coordinator logins**: `hod.cse`, `coord.fo`, … | Username + password | Same as the owner, for the module mapped to that login |
+| **Hospital**: `hosp.doctor` (Doctor), `hosp.assistant1`, `hosp.assistant2` (Medicine Assistants), `coord.hospital` | Username + password | Hospital Stock: issue, receive, register, alerts. `coord.hospital` (or an owner email) can also import the stock sheet |
 | **Wardens / caretakers**: `warden01–20`, `caretaker01–25`, `coord.outpass` | Username + password | Outpass module: issue outpasses, mark students in, register students |
 | **Temporary staff**: `staff01–30` | Username + password | Only the modules an admin ticks for them |
 | **Students / faculty**: any `@rguktong.ac.in` account, e.g. `o234747@rguktong.ac.in` | Google | *My ROSMS*: own campus status, own outpasses, own library loans, catalogue search |
@@ -102,7 +103,16 @@ can also be created from the links in the browser console errors the first time 
    node seed-users.mjs --key ./serviceAccount.json --csv ./users.csv --dry-run   # preview
    node seed-users.mjs --key ./serviceAccount.json --csv ./users.csv             # create
    ```
-   This creates the 91 username logins with their role documents, the `modules/*` owner documents (default HoD /
+   Then load the hospital's opening stock (111 medicines from the current stock sheet, kept as
+   [`scripts/data/hospital-opening-stock.json`](scripts/data/hospital-opening-stock.json)):
+   ```bash
+   node seed-hospital-stock.mjs --key ./serviceAccount.json --dry-run
+   node seed-hospital-stock.mjs --key ./serviceAccount.json
+   # or straight from an updated sheet: --xlsx ./medicine-stock.xlsx   (add --force to overwrite existing quantities)
+   ```
+   Alternatively, sign in as `coord.hospital` → Hospital → *Medicines & Receive* → **Import stock sheet**.
+
+   The user seed creates the 94 username logins with their role documents, the `modules/*` owner documents (default HoD /
    coordinator emails) and the default library rules. Re-running it is safe. Existing passwords are kept unless you pass
    `--reset-passwords`.
 4. Delete the key file and `users.csv` from shared machines when you're done.
@@ -116,6 +126,8 @@ The app goes live at **https://chan424.github.io/rosms/**.
 Sign in with `ao@rguktong.ac.in` (or another super admin) → **Administration**:
 - **Module owners:** confirm or adjust the HoD / coordinator emails. Assign owners for Central Stock (`spc@` or
   `epc@`), Hospital and Outpass.
+- **Hospital:** after the opening stock is loaded, set realistic *minimum levels* per medicine (Edit details) so
+  low-stock alerts match your usage.
 - **Users & staff logins:** tick modules for the temporary `staff01–30` logins and fill in *Assigned to*.
 
 ## Custom domain later

@@ -1,0 +1,194 @@
+rules_version = '2';
+
+// ROSMS — RGUKT Ongole Smart Management System
+// Server-side access control. The UI mirrors these rules (src/lib/permissions.ts),
+// but THESE rules are what actually protect the data.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- identity ----------
+    function signedIn() { return request.auth != null; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function provider() { return request.auth.token.firebase.sign_in_provider; }
+
+    // Google sign-in with a verified @rguktong.ac.in account.
+    function isInstitute() {
+      return signedIn() && provider() == 'google.com'
+        && request.auth.token.email_verified == true
+        && myEmail().matches('^[^@]+@rguktong[.]ac[.]in$');
+    }
+    // Username/password staff logins use synthetic emails username@rosms.local.
+    function isStaffLogin() {
+      return signedIn() && provider() == 'password'
+        && myEmail().matches('^[a-z0-9._-]+@rosms[.]local$');
+    }
+
+    // Keep in sync with src/config/roles.ts
+    function superAdmins() {
+      return ['ao@rguktong.ac.in', 'director@rguktong.ac.in', 'ncs@rguktong.ac.in', 'da@rguktong.ac.in'];
+    }
+    function isSuperAdmin() { return isInstitute() && myEmail() in superAdmins(); }
+
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function me() { return get(userPath()).data; }
+
+    // An active profile is required for everyone except super admins. Staff logins
+    // only get a profile when an admin (or the seed script) creates one, so a
+    // self-registered username@rosms.local account has no access at all.
+    function isActive() {
+      return isSuperAdmin() || (
+        (isInstitute() || isStaffLogin())
+        && exists(userPath())
+        && me().get('disabled', false) != true
+        && me().get('mustChangePassword', false) != true
+      );
+    }
+
+    // ---------- module access ----------
+    function stockModules() {
+      return ['hospital', 'central', 'cse', 'ece', 'eee', 'me', 'ce', 'civilworks',
+              'electricalworks', 'mechworks', 'itinfra', 'fo', 'dsw', 'ebs'];
+    }
+    function modPath(m) { return /databases/$(database)/documents/modules/$(m); }
+    function isOwner(m) {
+      return isInstitute() && exists(modPath(m)) && myEmail() in get(modPath(m)).data.get('owners', []);
+    }
+    function assigned(m) { return m in me().get('modules', []); }
+
+    // View + modify a module's data.
+    function canEdit(m) {
+      return isActive() && (
+        isSuperAdmin() || isOwner(m) || assigned(m)
+        || (m == 'outpass' && me().get('role', '') in ['warden', 'caretaker'])
+      );
+    }
+    // Manage a module (settings, audit log): super admin, owner email, or HoD/coordinator login of that module.
+    function canManage(m) {
+      return isActive() && (
+        isSuperAdmin() || isOwner(m)
+        || (me().get('role', '') in ['hod', 'coordinator'] && assigned(m))
+      );
+    }
+
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    // ---------- users ----------
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isSuperAdmin());
+
+      allow create: if
+        (isSuperAdmin()
+          && (request.resource.data.role != 'superadmin' || request.resource.data.email in superAdmins()))
+        || (isInstitute() && request.auth.uid == uid
+          && request.resource.data.email == myEmail()
+          && request.resource.data.role in ['student', 'faculty']
+          && request.resource.data.modules.size() == 0
+          && request.resource.data.disabled == false
+          && request.resource.data.mustChangePassword == false);
+
+      allow update: if
+        (isSuperAdmin()
+          && (request.resource.data.role != 'superadmin' || request.resource.data.email in superAdmins()))
+        || (signedIn() && request.auth.uid == uid
+          && changed().hasOnly(['mustChangePassword', 'lastLoginAt', 'displayName'])
+          && (!('mustChangePassword' in changed()) || request.resource.data.mustChangePassword == false)
+          && resource.data.get('disabled', false) != true);
+
+      allow delete: if isSuperAdmin();
+    }
+
+    // ---------- module settings (owners) ----------
+    match /modules/{m} {
+      allow read: if isInstitute() || isStaffLogin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ---------- library ----------
+    match /library_books/{id} {
+      allow read: if isActive();                       // everyone on campus can browse the catalogue
+      allow create, update: if canEdit('library')
+        && request.resource.data.copies is number && request.resource.data.copies >= 0
+        && request.resource.data.available is number && request.resource.data.available >= 0
+        && request.resource.data.available <= request.resource.data.copies;
+      allow delete: if canEdit('library');
+    }
+    match /library_members/{id} {
+      allow read, write: if canEdit('library');
+    }
+    match /library_loans/{id} {
+      allow read: if canEdit('library') || (isActive() && resource.data.memberEmail == myEmail());
+      allow create, update: if canEdit('library');
+      allow delete: if canManage('library');
+    }
+    match /library_reservations/{id} {
+      allow read: if canEdit('library') || (isActive() && resource.data.memberEmail == myEmail());
+      allow create, update: if canEdit('library');
+      allow delete: if canManage('library');
+    }
+    match /library_settings/{id} {
+      allow read: if isActive();
+      allow write: if canManage('library');
+    }
+
+    // ---------- stock engine (hospital, central, departments, works, offices) ----------
+    match /stock/{m}/items/{id} {
+      allow read: if m in stockModules() && canEdit(m);
+      allow create, update: if m in stockModules() && canEdit(m)
+        && request.resource.data.quantity is number && request.resource.data.quantity >= 0
+        && request.resource.data.name is string && request.resource.data.name.size() > 0;
+      allow delete: if m in stockModules() && canEdit(m) && resource.data.quantity == 0;
+    }
+    // Ledger is append-only.
+    match /stock/{m}/txns/{id} {
+      allow read: if m in stockModules() && canEdit(m);
+      allow create: if m in stockModules() && canEdit(m) && request.resource.data.by == myEmail();
+      allow update, delete: if false;
+    }
+    match /transfers/{id} {
+      allow read: if canEdit(resource.data.fromModule) || canEdit(resource.data.toModule);
+      allow create: if request.resource.data.fromModule in stockModules()
+        && request.resource.data.toModule in stockModules()
+        && request.resource.data.fromModule != request.resource.data.toModule
+        && canEdit(request.resource.data.fromModule)
+        && request.resource.data.status == 'pending'
+        && request.resource.data.requestedBy == myEmail();
+      allow update: if changed().hasOnly(['status', 'decidedBy', 'decidedAt', 'decisionNote', 'closedAt']) && (
+           (resource.data.status == 'pending' && request.resource.data.status in ['accepted', 'rejected'] && canEdit(resource.data.toModule))
+        || (resource.data.status == 'pending' && request.resource.data.status == 'cancelled' && canEdit(resource.data.fromModule))
+        || (resource.data.status == 'rejected' && request.resource.data.status == 'returned' && canEdit(resource.data.fromModule))
+      );
+      allow delete: if false;
+    }
+
+    // ---------- student campus status & outpass ----------
+    match /students/{email} {
+      allow read: if canEdit('outpass') || (isActive() && email == myEmail());
+      allow create, update: if canEdit('outpass') && email.matches('^[^@]+@rguktong[.]ac[.]in$');
+      allow delete: if canManage('outpass');
+    }
+    match /outpasses/{id} {
+      allow read: if canEdit('outpass') || (isActive() && resource.data.studentEmail == myEmail());
+      allow create: if canEdit('outpass')
+        && request.resource.data.issuedBy == myEmail()
+        && request.resource.data.status == 'out'
+        && request.resource.data.reason is string && request.resource.data.reason.size() > 0
+        && request.resource.data.expectedReturn is timestamp;
+      allow update: if canEdit('outpass') && resource.data.status == 'out'
+        && request.resource.data.status in ['returned', 'cancelled']
+        && changed().hasOnly(['status', 'actualReturn', 'late', 'returnedMarkedBy', 'cancelledAt', 'cancelledBy']);
+      allow delete: if false;
+    }
+
+    // ---------- audit log (append-only) ----------
+    match /audit/{id} {
+      allow create: if isActive()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if isSuperAdmin()
+        || (resource.data.module != 'admin' && resource.data.module != 'system' && canManage(resource.data.module));
+      allow update, delete: if false;
+    }
+
+    // Everything else is denied.
+  }
+}

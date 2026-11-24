@@ -1,0 +1,10 @@
+{
+  "indexes": [
+    { "collectionGroup": "library_loans", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "memberEmail", "order": "ASCENDING" }, { "fieldPath": "issuedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "outpasses", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "studentEmail", "order": "ASCENDING" }, { "fieldPath": "issuedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "transfers", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "fromModule", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "transfers", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "toModule", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "audit", "queryScope": "COLLECTION", "fields": [ { "fieldPath": "module", "order": "ASCENDING" }, { "fieldPath": "at", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}
