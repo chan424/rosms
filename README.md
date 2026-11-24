@@ -101,6 +101,8 @@ and that takes effect immediately.
    the rules only accept username accounts that an admin set up.
 
 ### 2. Connect the web app
+> **Already done for `rosms-3ac80`:** its public web config is built into [`src/firebaseConfig.ts`](src/firebaseConfig.ts), so no repository variables are needed. The steps below are only for a different Firebase project.
+
 1. **Project settings (⚙) → General → Your apps → Web (</>)** → register the app `rosms-web` (Firebase Hosting is not
    needed).
 2. Copy the `firebaseConfig` values.
@@ -131,6 +133,17 @@ firebase deploy --only firestore:rules,firestore:indexes
 can also be created from the links in the browser console errors the first time a screen needs one.)*
 
 ### 4. Create the staff logins (seed script)
+**Option A, no terminal (recommended): GitHub Actions.**
+1. Firebase console → **Project settings → Service accounts → Generate new private key**. This downloads a JSON file.
+2. GitHub → **chan424/rosms → Settings → Secrets and variables → Actions → Secrets → New repository secret**:
+   - `FIREBASE_SERVICE_ACCOUNT`: paste the whole content of that JSON file.
+   - `ROSMS_USERS_CSV`: paste the credentials sheet (`Role,Username,Module,Assigned to,Password`).
+3. **Actions → Seed Firebase (logins, hospital stock, rules) → Run workflow**. Run it first with *Dry run* ticked and check
+   the log, then run it again with *Dry run* unticked. It publishes the rules and indexes, creates the logins, and loads the
+   111 medicines. Secrets are never shown in logs, and the scripts never print passwords.
+4. Delete the downloaded JSON key from your computer. You can also delete the two secrets once the logins exist.
+
+**Option B, on your own computer:**
 1. Firebase console → **Project settings → Service accounts → Generate new private key**. This downloads a JSON key.
    **Keep it private. Never commit it.**
 2. Put your credentials spreadsheet (columns `Role,Username,Module,Assigned to,Password`) at `scripts/users.csv`. This
