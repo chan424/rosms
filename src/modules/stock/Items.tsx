@@ -16,7 +16,8 @@ import { useNotify } from '../../components/Notify';
 import { db } from '../../lib/firebase';
 import { logAudit } from '../../lib/audit';
 import { errMsg, inr } from '../../lib/format';
-import { readSheet } from '../../lib/exporters';
+import BulkImportDialog from '../../components/BulkImportDialog';
+import { itemImport, movementImport } from './bulk';
 import { STOCK_MODULES } from '../../config/modules';
 import { useStock } from './StockModule';
 import { adjustStock, createTransfer, dispense, stockIn, stockOut } from './ops';
@@ -34,7 +35,8 @@ export default function Items() {
   const [act, setAct] = useState<{ a: Action; item: StockItem } | null>(null);
   const [menu, setMenu] = useState<{ el: HTMLElement; item: StockItem } | null>(null);
   const [del, setDel] = useState<StockItem | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [bulk, setBulk] = useState<'items' | 'moves' | null>(null);
+  const [bulkMenu, setBulkMenu] = useState<HTMLElement | null>(null);
   const B = !!def.batches;
   const nav = useNavigate();
   const access = useAuth();
@@ -135,34 +137,6 @@ export default function Items() {
     notify(a === 'transfer' ? 'Transfer sent. The receiving module must accept it.' : 'Stock updated.');
   };
 
-  const importFile = async (f: File) => {
-    try {
-      const rows = await readSheet(f);
-      const pick = (r: Record<string, unknown>, ...keys: string[]) => {
-        for (const k of Object.keys(r)) if (keys.includes(k.toLowerCase().replace(/[^a-z]/g, ''))) return String(r[k] ?? '').trim();
-        return '';
-      };
-      const existing = new Set(items.map((i) => i.id));
-      let added = 0, skipped = 0;
-      const batch = writeBatch(db);
-      for (const r of rows.slice(0, 450)) {
-        const code = pick(r, 'code', 'itemcode');
-        const name = pick(r, 'name', 'itemname', 'item');
-        if (!code || !name || existing.has(safeCode(code))) { skipped++; continue; }
-        existing.add(safeCode(code));
-        batch.set(doc(db, itemsPath(def.id), safeCode(code)), {
-          code: code.toUpperCase(), name, unit: pick(r, 'unit', 'uom') || 'Nos', category: pick(r, 'category'), location: pick(r, 'location'),
-          minLevel: Number(pick(r, 'minlevel', 'min', 'reorderlevel')) || 0, unitPrice: Number(pick(r, 'unitprice', 'price', 'rate')) || 0,
-          description: pick(r, 'description', 'specifications'), quantity: 0, ...(B ? { batches: [] } : {}), createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
-        });
-        added++;
-      }
-      await batch.commit();
-      logAudit(def.id, 'import', 'item', '', `${added} items from ${f.name}`);
-      notify(`Imported ${added} item(s) with zero stock (use Stock in to add quantities); skipped ${skipped}.`, added ? 'success' : 'warning');
-    } catch (e) { notify(errMsg(e), 'error'); }
-  };
-
   const importMedicineSheet = async (f: File) => {
     try {
       const rows = parseMedicineRows(await readWorkbookRows(f));
@@ -213,10 +187,7 @@ export default function Items() {
       <DataTable title="Items" rows={items} columns={columns} loading={loading} exportName={`${def.id}-items`} dense
         toolbar={<>
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAdding(true)}>Add item</Button>
-          <Tooltip title="Excel/CSV columns: Code, Name, Unit, Category, Location, Min Level, Unit Price, Description">
-            <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => fileRef.current?.click()}>Import</Button>
-          </Tooltip>
-          <input ref={fileRef} type="file" hidden accept=".xlsx,.xls,.csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f); e.target.value = ''; }} />
+          <Button variant="outlined" startIcon={<UploadIcon />} onClick={(e) => setBulkMenu(e.currentTarget)}>Bulk upload (Excel)</Button>
           {B && manager && <>
             <Tooltip title="Upload the hospital stock sheet (sections like TABLETS / OINTMENTS / INJECTIONS, columns S No · Indent · Quantity; 'Nill' = 0). New medicines are added with their quantity as opening stock; existing names are skipped.">
               <Button variant="outlined" color="secondary" startIcon={<UploadIcon />} onClick={() => sheetRef.current?.click()}>Import stock sheet</Button>
@@ -224,6 +195,15 @@ export default function Items() {
             <input ref={sheetRef} type="file" hidden accept=".xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) importMedicineSheet(f); e.target.value = ''; }} />
           </>}
         </>} />
+      <Menu anchorEl={bulkMenu} open={!!bulkMenu} onClose={() => setBulkMenu(null)}>
+        <MenuItem onClick={() => { setBulk('items'); setBulkMenu(null); }}>
+          <Stack><Typography variant="body2">{B ? 'Medicines' : 'Items'}: add new / update details</Typography><Typography variant="caption" color="text.secondary">Item master with opening stock</Typography></Stack>
+        </MenuItem>
+        <MenuItem onClick={() => { setBulk('moves'); setBulkMenu(null); }}>
+          <Stack><Typography variant="body2">Stock in / out (many rows)</Typography><Typography variant="caption" color="text.secondary">{B ? 'Receipts with batch / expiry, issues to patients' : 'Receipts and issues, posted to the ledger'}</Typography></Stack>
+        </MenuItem>
+      </Menu>
+      {bulk && <BulkImportDialog open onClose={() => setBulk(null)} config={bulk === 'items' ? itemImport(def, items) : movementImport(def, items)} />}
       <Menu anchorEl={menu?.el} open={!!menu} onClose={() => setMenu(null)}>
         <MenuItem onClick={() => { nav(`/m/${def.id}/ledger?item=${encodeURIComponent(menu!.item.id)}`); setMenu(null); }}>View history</MenuItem>
         <MenuItem onClick={() => { setAct({ a: 'transfer', item: menu!.item }); setMenu(null); }}>Transfer…</MenuItem>
