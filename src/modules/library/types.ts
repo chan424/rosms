@@ -107,3 +107,7 @@ export const COL = {
   reservations: 'library_reservations',
   settings: 'library_settings',
 } as const;
+
+export const DEPTS = ['CSE', 'ECE', 'EEE', 'ME', 'CE', 'MME', 'CHE', 'PUC', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Telugu', 'Management', 'PED', 'Library', 'Administration', 'Other'];
+
+export const safeId = (s: string) => s.trim().replace(/[/#?\s]+/g, '-').slice(0, 120);

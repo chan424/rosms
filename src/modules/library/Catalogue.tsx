@@ -3,8 +3,8 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadIcon from '@mui/icons-material/UploadFile';
-import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore';
-import { useRef, useState } from 'react';
+import { deleteDoc, doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { useState } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import FormDialog, { type Field, type FormValues } from '../../components/FormDialog';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -12,11 +12,12 @@ import { useNotify } from '../../components/Notify';
 import { db } from '../../lib/firebase';
 import { logAudit } from '../../lib/audit';
 import { errMsg } from '../../lib/format';
-import { readSheet } from '../../lib/exporters';
 import { useLibrary } from './LibraryContext';
-import { CATEGORIES, COL, type Book } from './types';
+import { CATEGORIES, COL, safeId, type Book } from './types';
+import BulkImportDialog from '../../components/BulkImportDialog';
+import { bookImport } from './bulk';
 
-export const safeId = (s: string) => s.trim().replace(/[/#?\s]+/g, '-').slice(0, 120);
+export { safeId } from './types';
 
 const fields: Field[] = [
   { name: 'accessionNo', label: 'Accession No.', required: true, half: true },
@@ -38,7 +39,7 @@ export default function Catalogue() {
   const [edit, setEdit] = useState<Book | null>(null);
   const [adding, setAdding] = useState(false);
   const [del, setDel] = useState<Book | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [bulk, setBulk] = useState(false);
 
   const save = async (v: FormValues) => {
     const copies = Math.max(1, parseInt(v.copies, 10) || 1);
@@ -68,37 +69,6 @@ export default function Catalogue() {
       await deleteDoc(doc(db, COL.books, b.id));
       logAudit('library', 'delete', 'book', b.id, b.title);
       notify('Book removed.');
-    } catch (e) { notify(errMsg(e), 'error'); }
-  };
-
-  const importFile = async (f: File) => {
-    try {
-      const rows = await readSheet(f);
-      const pick = (r: Record<string, unknown>, ...keys: string[]) => {
-        for (const k of Object.keys(r)) if (keys.includes(k.toLowerCase().replace(/[^a-z]/g, ''))) return String(r[k] ?? '').trim();
-        return '';
-      };
-      let added = 0, skipped = 0;
-      const existing = new Set(books.map((b) => b.id));
-      for (let i = 0; i < rows.length; i += 400) {
-        const batch = writeBatch(db);
-        for (const r of rows.slice(i, i + 400)) {
-          const acc = pick(r, 'accessionno', 'accno', 'accession', 'accessionnumber');
-          const title = pick(r, 'title', 'booktitle');
-          if (!acc || !title || existing.has(safeId(acc))) { skipped++; continue; }
-          const copies = Math.max(1, parseInt(pick(r, 'copies', 'qty', 'quantity'), 10) || 1);
-          existing.add(safeId(acc));
-          batch.set(doc(db, COL.books, safeId(acc)), {
-            accessionNo: acc, title, author: pick(r, 'author', 'authors'), isbn: pick(r, 'isbn'), category: pick(r, 'category', 'subject') || 'General',
-            rack: pick(r, 'rack', 'shelf', 'location'), publisher: pick(r, 'publisher'), edition: pick(r, 'edition'), year: pick(r, 'year'),
-            price: Number(pick(r, 'price', 'cost')) || 0, copies, available: copies, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
-          });
-          added++;
-        }
-        await batch.commit();
-      }
-      logAudit('library', 'import', 'book', '', `${added} added, ${skipped} skipped from ${f.name}`);
-      notify(`Imported ${added} book(s); skipped ${skipped} (missing fields or duplicate accession no.).`, added ? 'success' : 'warning');
     } catch (e) { notify(errMsg(e), 'error'); }
   };
 
@@ -133,10 +103,7 @@ export default function Catalogue() {
         dense
         toolbar={<>
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAdding(true)}>Add book</Button>
-          <Tooltip title="Excel/CSV with columns: Accession No, Title, Author, ISBN, Category, Publisher, Edition, Year, Rack, Copies, Price">
-            <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => fileRef.current?.click()}>Import</Button>
-          </Tooltip>
-          <input ref={fileRef} type="file" hidden accept=".xlsx,.xls,.csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f); e.target.value = ''; }} />
+          <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulk(true)}>Bulk upload (Excel)</Button>
         </>}
       />
       <FormDialog
@@ -147,6 +114,7 @@ export default function Catalogue() {
         onClose={() => { setAdding(false); setEdit(null); }}
         onSubmit={save}
       />
+      <BulkImportDialog open={bulk} onClose={() => setBulk(false)} config={bookImport(books)} />
       <ConfirmDialog open={!!del} title="Delete book?" message={`Remove “${del?.title}” from the catalogue? This cannot be undone.`} danger confirmLabel="Delete" onClose={() => setDel(null)} onConfirm={() => del && remove(del)} />
     </>
   );

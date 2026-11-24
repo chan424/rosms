@@ -1,0 +1,83 @@
+name: Seed Firebase (logins, hospital stock, rules)
+
+# Run by the owner from the Actions tab. Needs two repository SECRETS
+# (Settings > Secrets and variables > Actions > Secrets):
+#   FIREBASE_SERVICE_ACCOUNT  - the whole JSON of the service-account key
+#                               (Firebase console > Project settings > Service accounts > Generate new private key)
+#   ROSMS_USERS_CSV           - the credentials sheet: Role,Username,Module,Assigned to,Password
+# Secrets are encrypted, never shown in logs, and the scripts never print passwords.
+# Nothing from these secrets is written to the repository or uploaded as an artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (preview only, no changes)'
+        type: boolean
+        default: true
+      seed_users:
+        description: 'Create / update the staff username logins'
+        type: boolean
+        default: true
+      seed_hospital:
+        description: 'Load the hospital opening stock (111 medicines; existing items are skipped)'
+        type: boolean
+        default: true
+      deploy_rules:
+        description: 'Publish firestore.rules and indexes (skipped in dry run)'
+        type: boolean
+        default: true
+      reset_passwords:
+        description: 'Reset passwords of EXISTING logins to the ones in the sheet'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seed
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Write credentials to the runner (temporary)
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          USERS: ${{ secrets.ROSMS_USERS_CSV }}
+        run: |
+          if [ -z "$SA" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT repository secret first."; exit 1; fi
+          umask 077
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          printf '%s\n' "$USERS" > "$RUNNER_TEMP/users.csv"
+          node -e "const k=require(process.env.RUNNER_TEMP+'/sa.json'); console.log('Service account for project:', k.project_id)"
+      - name: Install script dependencies
+        working-directory: scripts
+        run: npm install --no-audit --no-fund
+      - name: Publish Firestore rules and indexes
+        if: ${{ inputs.deploy_rules && !inputs.dry_run }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: |
+          P=$(node -e "console.log(require(process.env.GOOGLE_APPLICATION_CREDENTIALS).project_id)")
+          npx --yes firebase-tools@13 deploy --only firestore:rules,firestore:indexes --project "$P" --non-interactive
+      - name: Seed staff logins
+        if: ${{ inputs.seed_users }}
+        working-directory: scripts
+        run: |
+          if [ "$(wc -l < "$RUNNER_TEMP/users.csv")" -lt 2 ]; then echo "::error::Add the ROSMS_USERS_CSV repository secret first."; exit 1; fi
+          node seed-users.mjs --key "$RUNNER_TEMP/sa.json" --csv "$RUNNER_TEMP/users.csv" \
+            ${{ inputs.dry_run && '--dry-run' || '' }} ${{ inputs.reset_passwords && '--reset-passwords' || '' }}
+      - name: Load hospital opening stock
+        if: ${{ inputs.seed_hospital }}
+        working-directory: scripts
+        run: node seed-hospital-stock.mjs --key "$RUNNER_TEMP/sa.json" ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Remove credentials from the runner
+        if: ${{ always() }}
+        run: rm -f "$RUNNER_TEMP/sa.json" "$RUNNER_TEMP/users.csv"

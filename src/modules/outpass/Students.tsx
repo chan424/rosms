@@ -3,15 +3,16 @@ import AddIcon from '@mui/icons-material/PersonAdd';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
 import UploadIcon from '@mui/icons-material/UploadFile';
-import { collection, doc, getDocs, limit, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
-import { useEffect, useRef, useState } from 'react';
+import { collection, doc, getDocs, limit, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import DataTable, { type Column } from '../../components/DataTable';
 import FormDialog, { type Field, type FormValues } from '../../components/FormDialog';
 import { useNotify } from '../../components/Notify';
 import { db } from '../../lib/firebase';
 import { logAudit } from '../../lib/audit';
 import { errMsg } from '../../lib/format';
-import { readSheet } from '../../lib/exporters';
+import BulkImportDialog from '../../components/BulkImportDialog';
+import { studentImport } from './bulk';
 import { INSTITUTE_DOMAIN } from '../../config/roles';
 import { searchStudents } from './studentSearch';
 import { HOSTELS, type Student } from './types';
@@ -35,7 +36,7 @@ export default function Students() {
   const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState<Student | null>(null);
   const [adding, setAdding] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [bulk, setBulk] = useState(false);
 
   const load = async (t: string) => {
     setLoading(true);
@@ -57,37 +58,6 @@ export default function Students() {
     load(term);
   };
 
-  const importFile = async (f: File) => {
-    try {
-      const sheet = await readSheet(f);
-      const pick = (r: Record<string, unknown>, ...keys: string[]) => {
-        for (const k of Object.keys(r)) if (keys.includes(k.toLowerCase().replace(/[^a-z]/g, ''))) return String(r[k] ?? '').trim();
-        return '';
-      };
-      let added = 0, skipped = 0;
-      for (let i = 0; i < sheet.length; i += 400) {
-        const batch = writeBatch(db);
-        for (const r of sheet.slice(i, i + 400)) {
-          let email = pick(r, 'email', 'mail').toLowerCase();
-          const idNo = pick(r, 'id', 'idno', 'idnumber', 'rollno').toUpperCase();
-          if (!email && idNo) email = `${idNo.toLowerCase()}@${INSTITUTE_DOMAIN}`;
-          const name = pick(r, 'name', 'studentname', 'fullname');
-          if (!email.endsWith('@' + INSTITUTE_DOMAIN) || !name) { skipped++; continue; }
-          // merge keeps the current in/out status of existing students
-          batch.set(doc(db, 'students', email), {
-            email, idNo: email.split('@')[0].toUpperCase(), name, gender: pick(r, 'gender'), year: pick(r, 'year', 'class'), branch: pick(r, 'branch', 'department'),
-            hostel: pick(r, 'hostel'), room: pick(r, 'room', 'roomno'), phone: pick(r, 'phone', 'mobile'), parentPhone: pick(r, 'parentphone', 'parentmobile', 'fatherphone'), updatedAt: serverTimestamp(),
-          }, { merge: true });
-          added++;
-        }
-        await batch.commit();
-      }
-      // Students without a status field are treated as in campus.
-      logAudit('outpass', 'import', 'student', '', `${added} from ${f.name}`);
-      notify(`Imported/updated ${added} student(s); skipped ${skipped}. New students default to “in campus”.`, added ? 'success' : 'warning');
-    } catch (e) { notify(errMsg(e), 'error'); }
-  };
-
   const columns: Column<Student>[] = [
     { key: 'idNo', label: 'ID No.' }, { key: 'name', label: 'Name' }, { key: 'branch', label: 'Branch', hideOnMobile: true }, { key: 'year', label: 'Year', hideOnMobile: true },
     { key: 'hostel', label: 'Hostel' }, { key: 'room', label: 'Room', hideOnMobile: true }, { key: 'phone', label: 'Phone', hideOnMobile: true }, { key: 'parentPhone', label: 'Parent', hideOnMobile: true },
@@ -104,14 +74,12 @@ export default function Students() {
               slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> } }} />
             <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>{term.trim().length >= 2 ? 'Search results' : 'Showing students currently out of campus'}</Typography>
             <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAdding(true)}>Register student</Button>
-            <Tooltip title="Excel/CSV columns: ID No (or Email), Name, Gender, Year, Branch, Hostel, Room, Phone, Parent Phone">
-              <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => fileRef.current?.click()}>Import</Button>
-            </Tooltip>
-            <input ref={fileRef} type="file" hidden accept=".xlsx,.xls,.csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f); e.target.value = ''; }} />
+            <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => setBulk(true)}>Bulk upload (Excel)</Button>
           </Stack>
         </CardContent>
       </Card>
       <DataTable rows={rows} columns={columns} loading={loading} exportName="students" dense />
+      <BulkImportDialog open={bulk} onClose={() => { setBulk(false); load(term); }} config={studentImport()} />
       <FormDialog open={adding || !!edit} title={edit ? 'Edit student' : 'Register student'}
         fields={edit ? fields.map((f) => (f.name === 'email' ? { ...f, disabled: true } : f)) : fields}
         initial={edit ? Object.fromEntries(fields.map((f) => [f.name, String((edit as unknown as Record<string, unknown>)[f.name] ?? '')])) : undefined}
