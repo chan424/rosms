@@ -1,0 +1,20 @@
+node_modules/
+dist/
+*.local
+.env
+.env.*
+!.env.example
+# Never commit credentials or service account keys
+credentials/
+*.credentials.csv
+rosms-credentials*.csv
+serviceAccount*.json
+service-account*.json
+*-firebase-adminsdk-*.json
+scripts/users.csv
+.DS_Store
+npm-debug.log*
+firestore-debug.log
+*-debug.log
+scripts/package-lock.json
+tests/package-lock.json
