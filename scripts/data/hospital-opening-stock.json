@@ -1,0 +1,782 @@
+{
+ "source": "College hospital medicine stock sheet (Sheet1), loaded as opening stock",
+ "items": [
+  {
+   "code": "TAB-001",
+   "name": "Amoxy Clav 625Mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-002",
+   "name": "Cefixime 200Mg",
+   "category": "Tablets",
+   "qty": 80,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-003",
+   "name": "Azithromycin 500Mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-004",
+   "name": "Erythromycine 500Mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-005",
+   "name": "Erythromycine 250Mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-006",
+   "name": "Paracetamool 500Mg",
+   "category": "Tablets",
+   "qty": 950,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-007",
+   "name": "Paracetamol 650Mg",
+   "category": "Tablets",
+   "qty": 780,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-008",
+   "name": "Aceclofenac 100mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-009",
+   "name": "Dicyclomine HCL + Paracetamol 345mg",
+   "category": "Tablets",
+   "qty": 40,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-010",
+   "name": "Naproxen 250mg",
+   "category": "Tablets",
+   "qty": 100,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-011",
+   "name": "Mefenamic Acid 500mg",
+   "category": "Tablets",
+   "qty": 250,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-012",
+   "name": "Citrizine 10mg",
+   "category": "Tablets",
+   "qty": 2560,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-013",
+   "name": "Pheniramine Maleate 25mg",
+   "category": "Tablets",
+   "qty": 500,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-014",
+   "name": "Derphyiline 100mg",
+   "category": "Tablets",
+   "qty": 300,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-015",
+   "name": "Ondansetron 4mg",
+   "category": "Tablets",
+   "qty": 200,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-016",
+   "name": "Bisacodyl (Dulcoflex) 5mg",
+   "category": "Tablets",
+   "qty": 10,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-017",
+   "name": "Metronidazole 400mg",
+   "category": "Tablets",
+   "qty": 410,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-018",
+   "name": "Ofloxacin + Ornidazole 700mg",
+   "category": "Tablets",
+   "qty": 60,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-019",
+   "name": "Vertin 8mg",
+   "category": "Tablets",
+   "qty": 500,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-020",
+   "name": "Tranexa 500mg",
+   "category": "Tablets",
+   "qty": 220,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-021",
+   "name": "B- Complex",
+   "category": "Tablets",
+   "qty": 200,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-022",
+   "name": "Fluconazole",
+   "category": "Tablets",
+   "qty": 10,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-023",
+   "name": "Cap Chloramphenicol",
+   "category": "Tablets",
+   "qty": 20,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-024",
+   "name": "Levo Cetrizine5mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-025",
+   "name": "Gelusil",
+   "category": "Tablets",
+   "qty": 1400,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-026",
+   "name": "Aceclofenac+ serratiopeptiase+paracetamol",
+   "category": "Tablets",
+   "qty": 170,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-027",
+   "name": "Montelukast + levo cetrizine 15mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-028",
+   "name": "Aceclofenac + paracetamol 425mg",
+   "category": "Tablets",
+   "qty": 1300,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-029",
+   "name": "Pantaprazole 40mg",
+   "category": "Tablets",
+   "qty": 300,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-030",
+   "name": "kuffq",
+   "category": "Tablets",
+   "qty": 660,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-031",
+   "name": "Cap Karvol Plus",
+   "category": "Tablets",
+   "qty": 60,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-032",
+   "name": "Cofsils",
+   "category": "Tablets",
+   "qty": 70,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-033",
+   "name": "sporlac 120M",
+   "category": "Tablets",
+   "qty": 105,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-034",
+   "name": "ORS (small)",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-035",
+   "name": "Levofloxacin 500mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-036",
+   "name": "Levofloxacin 250mg",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-037",
+   "name": "Eldoper",
+   "category": "Tablets",
+   "qty": 570,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-038",
+   "name": "Narfloxacin",
+   "category": "Tablets",
+   "qty": 100,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-039",
+   "name": "Buscopan",
+   "category": "Tablets",
+   "qty": 35,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-040",
+   "name": "Riboflavin",
+   "category": "Tablets",
+   "qty": 26,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-041",
+   "name": "Saridon",
+   "category": "Tablets",
+   "qty": 0,
+   "unit": "Tablet"
+  },
+  {
+   "code": "TAB-042",
+   "name": "Coldact",
+   "category": "Tablets",
+   "qty": 50,
+   "unit": "Tablet"
+  },
+  {
+   "code": "OSD-001",
+   "name": "Calamine lotion (120 ml)",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-002",
+   "name": "Biosore Gel",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 3,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-003",
+   "name": "Clotrimazole cream",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-004",
+   "name": "Fusidic Acid Cream",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 4,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-005",
+   "name": "Clobtal GM",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 7,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-006",
+   "name": "Permethrin 5% Cream",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-007",
+   "name": "Terbinafine HCL",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 11,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-008",
+   "name": "Clinsol 1%",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-009",
+   "name": "Betamethasone 0.10% 20 Gm",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 8,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-010",
+   "name": "Ciplox EYE/EAR Drops",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 25,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-011",
+   "name": "Carboxy Methyl Cellulose Eye Drops",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-012",
+   "name": "Ambroxol syrup",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-013",
+   "name": "Alkof syrup(60ml)",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-014",
+   "name": "Diclofenac Gel (15gm)",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-015",
+   "name": "Silver Nitrate 0.2% 10 Gm",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 3,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-016",
+   "name": "Zip lock covers 3*3",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-017",
+   "name": "Face Mask",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-018",
+   "name": "permethrin 5% lotion",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 2,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-019",
+   "name": "Benzoic acid + Salisilic Acid",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-020",
+   "name": "Ketoconazole Cream",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-021",
+   "name": "Hand Sanitzer",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-022",
+   "name": "Dygine syrup",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "OSD-023",
+   "name": "ENO",
+   "category": "Ointments, Drops & Syrups",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-001",
+   "name": "Inj Pantoprozole 40mg",
+   "category": "Injections & Surgical Items",
+   "qty": 25,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-002",
+   "name": "Inj Diclofenac sodium 3ml",
+   "category": "Injections & Surgical Items",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-003",
+   "name": "Inj Ondonsetron 8ml",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-004",
+   "name": "Inj Hydrocortisone",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-005",
+   "name": "Inj Pheiramine maleate 2ml (avil)",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-006",
+   "name": "Inj Paracetamol+Lignocaine 2ml(fevastin)",
+   "category": "Injections & Surgical Items",
+   "qty": 70,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-007",
+   "name": "Inj Cyclopam 2ml",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-008",
+   "name": "Inj Ceftraxone",
+   "category": "Injections & Surgical Items",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-009",
+   "name": "Inj T.T",
+   "category": "Injections & Surgical Items",
+   "qty": 50,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-010",
+   "name": "Inj Diclofenac sodium 1ml",
+   "category": "Injections & Surgical Items",
+   "qty": 50,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-011",
+   "name": "DNS 500ml",
+   "category": "Injections & Surgical Items",
+   "qty": 20,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-012",
+   "name": "NS 500ml",
+   "category": "Injections & Surgical Items",
+   "qty": 20,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-013",
+   "name": "RL500ml",
+   "category": "Injections & Surgical Items",
+   "qty": 20,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-014",
+   "name": "IV set",
+   "category": "Injections & Surgical Items",
+   "qty": 100,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-015",
+   "name": "IV cannula size 22g",
+   "category": "Injections & Surgical Items",
+   "qty": 60,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-016",
+   "name": "Easy fix",
+   "category": "Injections & Surgical Items",
+   "qty": 20,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-017",
+   "name": "Syringes 3ml",
+   "category": "Injections & Surgical Items",
+   "qty": 200,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-018",
+   "name": "Syringes 5ml",
+   "category": "Injections & Surgical Items",
+   "qty": 100,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-019",
+   "name": "Syrines 10 ml",
+   "category": "Injections & Surgical Items",
+   "qty": 50,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-020",
+   "name": "Scalp vein size ng 20",
+   "category": "Injections & Surgical Items",
+   "qty": 30,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-021",
+   "name": "Needle",
+   "category": "Injections & Surgical Items",
+   "qty": 100,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-022",
+   "name": "Inj Derphyline",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-023",
+   "name": "Nebulizer resipuloes",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-024",
+   "name": "Examination gloves non steril",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Box"
+  },
+  {
+   "code": "INJ-025",
+   "name": "Povidone solution",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-026",
+   "name": "Povidone Cream",
+   "category": "Injections & Surgical Items",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-027",
+   "name": "Surgical spirt 400ml",
+   "category": "Injections & Surgical Items",
+   "qty": 3,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-028",
+   "name": "Hydrogen peroxide 400ml",
+   "category": "Injections & Surgical Items",
+   "qty": 2,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-029",
+   "name": "Cotton roll",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-030",
+   "name": "Bandage rolls",
+   "category": "Injections & Surgical Items",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-031",
+   "name": "Paper plaster 1inch",
+   "category": "Injections & Surgical Items",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-032",
+   "name": "Firstaid bandage( plaster bandage)",
+   "category": "Injections & Surgical Items",
+   "qty": 100,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-033",
+   "name": "Sugar Test Strips",
+   "category": "Injections & Surgical Items",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-034",
+   "name": "Glycerin 100ml",
+   "category": "Injections & Surgical Items",
+   "qty": 4,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-035",
+   "name": "Epsom Salt",
+   "category": "Injections & Surgical Items",
+   "qty": 0,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-036",
+   "name": "Inj. Buscopan",
+   "category": "Injections & Surgical Items",
+   "qty": 10,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-037",
+   "name": "Glucose(1kg)",
+   "category": "Injections & Surgical Items",
+   "qty": 7,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-038",
+   "name": "Alkaline Citrate",
+   "category": "Injections & Surgical Items",
+   "qty": 3,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-039",
+   "name": "Moov 30gm",
+   "category": "Injections & Surgical Items",
+   "qty": 5,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-040",
+   "name": "Moov spray",
+   "category": "Injections & Surgical Items",
+   "qty": 15,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-041",
+   "name": "Nebuliser Machine",
+   "category": "Injections & Surgical Items",
+   "qty": 2,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-042",
+   "name": "Weight Machine",
+   "category": "Injections & Surgical Items",
+   "qty": 2,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-043",
+   "name": "Gulcometer",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-044",
+   "name": "Pluse Oximeter",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-045",
+   "name": "Tourch light",
+   "category": "Injections & Surgical Items",
+   "qty": 1,
+   "unit": "Nos"
+  },
+  {
+   "code": "INJ-046",
+   "name": "Digital thermometer",
+   "category": "Injections & Surgical Items",
+   "qty": 2,
+   "unit": "Nos"
+  }
+ ]
+}
