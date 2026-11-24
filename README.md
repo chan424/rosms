@@ -16,7 +16,7 @@ secure place.
 
 | # | Module | Status |
 |---|--------|--------|
-| 1 | **Library Management**: catalogue (accession no., title, author, ISBN, category, copies, rack), members, issue/return, due dates, renewals, fines, reservations with queue, overdue list, history, dashboard, Excel import, Excel/PDF export, circulation rules | ✅ Complete |
+| 1 | **Library Management**: catalogue (accession no., title, author, ISBN, category, copies, rack), members, issue/return, due dates, renewals, fines, reservations with queue, overdue list, history, dashboard, Excel bulk upload (add/update), Excel/PDF export, circulation rules | ✅ Complete |
 | 2 | **Hospital Stock & Dispensary**: opening stock loaded from the college medicine sheet (111 items: Tablets / Ointments, Drops & Syrups / Injections & Surgical Items). **Issue medicines** to a student (ID like `O234747`), staff, faculty or other: several medicines per visit, quantity, optional complaint/diagnosis, automatic date/time and issued-by. **Receive** new stock with quantity, batch, expiry, supplier and indent/invoice ref, and received-on date. First-expiry-first-out batches, write-offs for expired or damaged stock, per-medicine history, **daily issue register**, **search by student ID** to see everything given to them, out-of-stock / low-stock / expiry alerts, Excel/PDF export, and in-app import of the stock sheet | ✅ Complete |
 | 3 | **Central Stock**: Central Stores. Departments transfer to and from it | ✅ Working |
 | 4 | **Department & office stock**: CSE, ECE, EEE, ME, CE, Civil Works, Electrical Works, Mechanical Works, IT Infra, FO, DSW, EBS. All share one stock engine: items, stock in/out, physical-count adjustment, append-only ledger, transfers with accept/reject, low-stock alerts, import/export | ✅ Working |
@@ -25,6 +25,46 @@ secure place.
 
 Modules come from a registry ([`src/config/modules.ts`](src/config/modules.ts)). To add another stock module, add one
 entry there, add its id to `stockModules()` in `firestore.rules`, and add it to the seed script.
+
+## Bulk upload from Excel (every module)
+
+Every data screen has **manual entry** (Add / Edit forms) and a **Bulk upload (Excel)** button. Only people who can
+open that module see it, and the Firestore rules enforce the same limit on the server.
+
+1. **Download Excel template**: a `Data` sheet with the header row, and an `Instructions` sheet listing every column,
+   whether it is required, the allowed values, and sample rows.
+2. **Upload** the filled `.xlsx` / `.xls` / `.csv` (or drag it in), or **paste** rows copied from Excel or Google Sheets.
+   Columns can be in any order, and common header spellings are recognised (`Acc No`, `Qty`, `Rate`, `Roll No`…).
+3. **Preview**: each row is marked *New*, *Update*, *Skip* or *Error* with the reason (missing required value, bad
+   number or date, duplicate row, unknown item code, not enough stock…). Pick the mode: *add new and update existing*,
+   *add new only*, or *update existing only*. Rows with errors are never written, and **Download error rows** gives
+   them back as a sheet you can fix and re-upload.
+4. **Import**: rows are written in batches with a progress bar, and each upload is recorded in the audit log.
+
+When a row updates an existing record, blank cells keep the current value. Dates can be `YYYY-MM-DD`, `DD-MM-YYYY`,
+`DD/MM/YYYY`, `31-Mar-2027` or `Mar 2027` (expiry style, meaning the last day of that month).
+
+| Screen | Matched on | Columns (**required**) |
+|---|---|---|
+| Library → Catalogue | Accession No | **Accession No, Title**, Author, ISBN, Category, Publisher, Edition, Year, Rack, Copies, Price |
+| Library → Members | Member ID | **Member ID, Name**, Type (student/faculty/staff), Email (@rguktong.ac.in), Department, Year, Phone, Active (Yes/No) |
+| Any stock module → Items: add new / update | Item Code | **Item Code, Item Name**, Unit, Category, Location, Min Level, Unit Price, Quantity, Description |
+| Hospital → Medicines: add new / update | Item Code | **Item Code, Medicine Name**, Unit, Category, Location, Min Level, Unit Price, Quantity, Batch No, Expiry, Description |
+| Any stock module → Stock in / out | (each row is a movement) | **Item Code, Movement (IN/OUT), Quantity**, Date, Reference, Supplier / Issued To, Remarks |
+| Hospital → Stock in / out | (each row is a movement) | as above + Batch No, Expiry, Patient Type, Patient ID, Patient Name, Complaint |
+| Outpass → Students | institute email (from ID No) | **Name**, plus **ID No or Email**, Gender, Year, Branch, Hostel, Room, Phone, Parent Phone |
+
+Stock rules that bulk upload keeps:
+- **New items**: *Quantity* becomes the opening stock and is written to the ledger. For the hospital it goes into the
+  given batch and expiry (blank batch = `OPENING`).
+- **Existing items**: details are updated, and quantities change only through the ledger. For non-hospital modules,
+  ticking *Apply Quantity of existing items as a physical count* posts an **Adjustment** for each item whose count
+  differs.
+- **Stock in / out** rows go through the same transactional code as the manual buttons, in sheet order. An OUT row
+  can never take stock below zero, which the preview checks with running totals. Hospital OUT rows are recorded as
+  patient issues, so they appear in the daily register and in the patient's history.
+- The hospital's original medicine stock sheet (sections with S No / Indent / Quantity) can still be loaded with
+  **Import stock sheet**.
 
 ## Who can do what
 
