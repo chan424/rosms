@@ -1,0 +1,95 @@
+Role,Username,Module,Assigned to
+Warden,warden01,Outpass / Hostel,
+Warden,warden02,Outpass / Hostel,
+Warden,warden03,Outpass / Hostel,
+Warden,warden04,Outpass / Hostel,
+Warden,warden05,Outpass / Hostel,
+Warden,warden06,Outpass / Hostel,
+Warden,warden07,Outpass / Hostel,
+Warden,warden08,Outpass / Hostel,
+Warden,warden09,Outpass / Hostel,
+Warden,warden10,Outpass / Hostel,
+Warden,warden11,Outpass / Hostel,
+Warden,warden12,Outpass / Hostel,
+Warden,warden13,Outpass / Hostel,
+Warden,warden14,Outpass / Hostel,
+Warden,warden15,Outpass / Hostel,
+Warden,warden16,Outpass / Hostel,
+Warden,warden17,Outpass / Hostel,
+Warden,warden18,Outpass / Hostel,
+Warden,warden19,Outpass / Hostel,
+Warden,warden20,Outpass / Hostel,
+Caretaker,caretaker01,Outpass / Hostel,
+Caretaker,caretaker02,Outpass / Hostel,
+Caretaker,caretaker03,Outpass / Hostel,
+Caretaker,caretaker04,Outpass / Hostel,
+Caretaker,caretaker05,Outpass / Hostel,
+Caretaker,caretaker06,Outpass / Hostel,
+Caretaker,caretaker07,Outpass / Hostel,
+Caretaker,caretaker08,Outpass / Hostel,
+Caretaker,caretaker09,Outpass / Hostel,
+Caretaker,caretaker10,Outpass / Hostel,
+Caretaker,caretaker11,Outpass / Hostel,
+Caretaker,caretaker12,Outpass / Hostel,
+Caretaker,caretaker13,Outpass / Hostel,
+Caretaker,caretaker14,Outpass / Hostel,
+Caretaker,caretaker15,Outpass / Hostel,
+Caretaker,caretaker16,Outpass / Hostel,
+Caretaker,caretaker17,Outpass / Hostel,
+Caretaker,caretaker18,Outpass / Hostel,
+Caretaker,caretaker19,Outpass / Hostel,
+Caretaker,caretaker20,Outpass / Hostel,
+Caretaker,caretaker21,Outpass / Hostel,
+Caretaker,caretaker22,Outpass / Hostel,
+Caretaker,caretaker23,Outpass / Hostel,
+Caretaker,caretaker24,Outpass / Hostel,
+Caretaker,caretaker25,Outpass / Hostel,
+Staff (temp),staff01,Assigned by admin,
+Staff (temp),staff02,Assigned by admin,
+Staff (temp),staff03,Assigned by admin,
+Staff (temp),staff04,Assigned by admin,
+Staff (temp),staff05,Assigned by admin,
+Staff (temp),staff06,Assigned by admin,
+Staff (temp),staff07,Assigned by admin,
+Staff (temp),staff08,Assigned by admin,
+Staff (temp),staff09,Assigned by admin,
+Staff (temp),staff10,Assigned by admin,
+Staff (temp),staff11,Assigned by admin,
+Staff (temp),staff12,Assigned by admin,
+Staff (temp),staff13,Assigned by admin,
+Staff (temp),staff14,Assigned by admin,
+Staff (temp),staff15,Assigned by admin,
+Staff (temp),staff16,Assigned by admin,
+Staff (temp),staff17,Assigned by admin,
+Staff (temp),staff18,Assigned by admin,
+Staff (temp),staff19,Assigned by admin,
+Staff (temp),staff20,Assigned by admin,
+Staff (temp),staff21,Assigned by admin,
+Staff (temp),staff22,Assigned by admin,
+Staff (temp),staff23,Assigned by admin,
+Staff (temp),staff24,Assigned by admin,
+Staff (temp),staff25,Assigned by admin,
+Staff (temp),staff26,Assigned by admin,
+Staff (temp),staff27,Assigned by admin,
+Staff (temp),staff28,Assigned by admin,
+Staff (temp),staff29,Assigned by admin,
+Staff (temp),staff30,Assigned by admin,
+HoD,hod.library,Library,Dr. B. Deenadhayalu
+Coordinator,coord.hospital,Hospital Stock,(to be assigned)
+Coordinator,coord.central,Central Stock,(spc@ / epc@ to confirm)
+HoD,hod.cse,CSE Stock,Mrs. P. Sindhu
+HoD,hod.ece,ECE Stock,Mr. M. Vijayabhaskar
+HoD,hod.eee,EEE Stock,Dr. M. Sriramulu Naik
+HoD,hod.me,ME Stock,Ms. C. B. Priya
+HoD,hod.ce,CE Stock,Dr. R G G Rohith Kiran
+Coordinator,coord.civilworks,Civil Works Stock,Dr. K. Varun Teja
+Coordinator,coord.electricalworks,Electrical Works Stock,Dr. A. Ravi Teja / Mr. M. Rajasekhar
+Coordinator,coord.mechworks,Mechanical Works Stock,Dr. D. Ravi Chandra
+Coordinator,coord.itinfra,IT Infra Stock,(name not listed)
+Coordinator,coord.fo,FO Stock,Dr. Shaik Meeravali
+Coordinator,coord.dsw,DSW Stock,Mr. R. Dilip
+Coordinator,coord.ebs,EBS Stock,Mr. G. Srenivasa Rao
+Coordinator,coord.outpass,Student Outpass (chief),(to be assigned)
+Doctor,hosp.doctor,Hospital Stock,(College doctor)
+Medicine Assistant,hosp.assistant1,Hospital Stock,(Medicine assistant)
+Medicine Assistant,hosp.assistant2,Hospital Stock,(Medicine assistant)

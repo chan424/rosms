@@ -1,0 +1,15 @@
+{
+  "name": "rosms-admin-scripts",
+  "private": true,
+  "type": "module",
+  "description": "One-time / maintenance scripts run by the ROSMS owner on their own computer. Requires a Firebase service account key.",
+  "scripts": {
+    "seed": "node seed-users.mjs",
+    "manage": "node manage-users.mjs",
+    "seed:hospital": "node seed-hospital-stock.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}
