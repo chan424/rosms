@@ -48,7 +48,7 @@ print passwords, and the backup only includes the database when it can be encryp
 - Firebase console → Authentication → Settings: keep **user account creation** limited to what ROSMS uses
   (Google + Email/Password) and consider adding an **authorized domain** list of only your site's domains.
 - Optionally restrict the web API key to your site's domains in Google Cloud console → APIs & Services → Credentials
-  (HTTP referrers: `chan424.github.io/*`, `localhost:*`).
+  (HTTP referrers: `rosms.in/*`, `www.rosms.in/*`, `chan424.github.io/*`, `localhost:*`).
 - If a service-account key is ever exposed, delete it in Google Cloud console → IAM → Service accounts → Keys,
   create a new one and update the secret.
 

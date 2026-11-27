@@ -25,7 +25,7 @@ jobs:
       VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
       VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
       VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
-      # Custom domain (e.g. rosms.rguktong.ac.in). When set, the site is served from "/".
+      # Optional override of the custom domain in public/CNAME (rosms.in).
       CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
     steps:
       - uses: actions/checkout@v4
@@ -36,11 +36,12 @@ jobs:
       - run: npm ci
       - name: Build
         run: |
-          if [ -n "$CUSTOM_DOMAIN" ]; then export BASE_PATH=/; else export BASE_PATH=/${{ github.event.repository.name }}/; fi
-          echo "Building with BASE_PATH=$BASE_PATH"
+          # Relative asset paths (vite base "./") work at https://rosms.in/ and https://chan424.github.io/rosms/.
           npm run build
-          cp dist/index.html dist/404.html
           if [ -n "$CUSTOM_DOMAIN" ]; then echo "$CUSTOM_DOMAIN" > dist/CNAME; fi
+          echo "Custom domain: $(cat dist/CNAME 2>/dev/null || echo none)"
+          # Unknown paths go back to the app's home page (all app pages are hash routes: /#/...).
+          printf '%s\n' '<!doctype html><meta charset="utf-8"><title>ROSMS</title><script>var r=location.pathname.indexOf("/${{ github.event.repository.name }}/")===0?"/${{ github.event.repository.name }}/":"/";location.replace(r+location.search+location.hash)</script>' > dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

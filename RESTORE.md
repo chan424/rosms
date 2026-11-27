@@ -36,7 +36,8 @@ The website is rebuilt from the `main` branch on every push, so restoring the co
 3. Upload the contents of `site/` (GitHub → **Add file → Upload files**, drag the folder contents in,
    including the hidden `.github` folder) and commit to `main`.
    Or with git: `cd site && git init -b main && git add . && git commit -m "Restore" && git remote add origin https://github.com/<you>/rosms.git && git push -f origin main`.
-4. **Settings → Pages → Source: GitHub Actions** (only needed for a new repository).
+4. **Settings → Pages → Source: GitHub Actions** and **Custom domain: `rosms.in`** (only needed for a new repository;
+   the domain's DNS at Hostinger keeps pointing to GitHub, so nothing changes there).
 5. Add the repository secrets again if it is a new repository: `FIREBASE_SERVICE_ACCOUNT`, `ROSMS_USERS_CSV`, `BACKUP_PASSPHRASE`.
 6. Wait for **Actions → Deploy to GitHub Pages** to go green. The site is live again.
 

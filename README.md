@@ -95,8 +95,8 @@ and that takes effect immediately.
    - Enable **Google** (set the support email).
    - Enable **Email/Password** (leave *Email link* off).
 4. **Authentication → Settings → Authorized domains** → add:
+   - `rosms.in` and `www.rosms.in` (the live site)
    - `chan424.github.io`
-   - your future custom domain (e.g. `rosms.rguktong.ac.in`), when you have it.
 5. Leave **Authentication → Settings → User actions → Enable create (sign-up)** turned **on**. Students and faculty
    need it for their first Google sign-in. A username account that someone creates outside ROSMS has no access, because
    the rules only accept username accounts that an admin set up.
@@ -174,7 +174,7 @@ can also be created from the links in the browser console errors the first time 
 ### 5. Turn on GitHub Pages
 **chan424/rosms → Settings → Pages → Build and deployment → Source: GitHub Actions.**
 Then go to **Actions → Deploy to GitHub Pages → Run workflow**. Every later push to `main` deploys automatically.
-The app goes live at **https://chan424.github.io/rosms/**.
+The app goes live at **https://rosms.in/** (custom domain, see below); https://chan424.github.io/rosms/ redirects there.
 
 ### 6. First sign-in
 Sign in with `ao@rguktong.ac.in` (or another super admin) → **Administration**:
@@ -184,12 +184,16 @@ Sign in with `ao@rguktong.ac.in` (or another super admin) → **Administration**
   low-stock alerts match your usage.
 - **Users & staff logins:** tick modules for the temporary `staff01–30` logins and fill in *Assigned to*.
 
-## Custom domain later
-1. Add a repository variable `CUSTOM_DOMAIN` = e.g. `rosms.rguktong.ac.in`. The workflow then builds for `/` and writes
-   the `CNAME` file.
-2. At your DNS provider, add a `CNAME` record for `rosms` pointing to `chan424.github.io`.
-3. GitHub → Settings → Pages → Custom domain → enter the domain → tick **Enforce HTTPS** once it's available.
-4. Firebase → Authentication → Authorized domains → add the domain.
+## Custom domain (rosms.in)
+The site is served at **https://rosms.in/**. `public/CNAME` holds the domain and the build uses relative asset paths,
+so the same build also works at `chan424.github.io/rosms/`.
+1. **DNS (Hostinger → Domains → rosms.in → DNS / Nameservers):** delete the parking `A` record for `@`, then add
+   - `A` `@` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - (optional) `AAAA` `@` → `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
+   - `CNAME` `www` → `chan424.github.io`
+2. GitHub → Settings → Pages → Custom domain → `rosms.in` → Save → tick **Enforce HTTPS** once the certificate is ready.
+3. Firebase → Authentication → Settings → Authorized domains → add `rosms.in` and `www.rosms.in`.
+4. To use a different domain later, change `public/CNAME` (or set the repository variable `CUSTOM_DOMAIN`).
 
 The app uses hash URLs (`/#/m/library`), so deep links work on Pages and on any domain without server rewrites.
 
@@ -222,7 +226,7 @@ zip can be encrypted. Without the secrets the run still succeeds with a code-onl
 ```bash
 npm ci
 cp .env.example .env.local   # fill in the Firebase values
-npm run dev                  # http://localhost:5173/rosms/
+npm run dev                  # http://localhost:5173/
 npm run build                # type-check + production build
 ```
 Add `localhost` to Firebase authorized domains (it is there by default).

@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// BASE_PATH: "/rosms/" for https://chan424.github.io/rosms/ (default),
-// "/" when served from a custom domain (set repo variable BASE_PATH=/ in GitHub).
+// Relative base ("./"): the app uses hash routes (/#/...), so every page is index.html and the same build
+// works at https://rosms.in/ (custom domain, public/CNAME) and at https://chan424.github.io/rosms/.
+// Set BASE_PATH (e.g. "/") to force an absolute base.
 export default defineConfig({
-  base: process.env.BASE_PATH || '/rosms/',
+  base: process.env.BASE_PATH || './',
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 1500,
