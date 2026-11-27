@@ -1,0 +1,119 @@
+name: Daily backup (website + database)
+
+# Every day at 01:30 IST (20:00 UTC) and on demand from the Actions tab.
+# Produces rosms-backup-YYYY-MM-DD.zip (kept 30 days under this run's "Artifacts").
+#
+# Repository SECRETS used (Settings > Secrets and variables > Actions > Secrets):
+#   FIREBASE_SERVICE_ACCOUNT  - service-account JSON (same one the Seed workflow uses)
+#   BACKUP_PASSPHRASE         - a long password you choose. The zip is AES-256 encrypted with it.
+#
+# This repository is PUBLIC and anyone signed in to GitHub can download artifacts of a public repo,
+# so the database (student, patient and staff records) is ONLY exported when BACKUP_PASSPHRASE is
+# set, and then the whole zip is AES-256 encrypted. Without the secrets, the run still succeeds and
+# produces an unencrypted zip of the website source only (which is public anyway).
+
+on:
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Name today's backup
+        id: meta
+        run: |
+          D=$(TZ=Asia/Kolkata date +%F)
+          echo "date=$D" >> "$GITHUB_OUTPUT"
+          echo "name=rosms-backup-$D" >> "$GITHUB_OUTPUT"
+          mkdir -p "$RUNNER_TEMP/backup/site" "$RUNNER_TEMP/out"
+
+      - name: Copy the website source code
+        run: |
+          # Exactly what is committed on this branch (no node_modules, no build output, no local secrets).
+          git archive --format=tar HEAD | tar -x -C "$RUNNER_TEMP/backup/site"
+          cp RESTORE.md "$RUNNER_TEMP/backup/RESTORE.md"
+
+      - name: Export the Firestore database
+        id: db
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$SA" ]; then
+            echo "::warning::FIREBASE_SERVICE_ACCOUNT secret is not set - database NOT backed up (website code only)."
+            echo "status=skipped (FIREBASE_SERVICE_ACCOUNT not set)" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if [ -z "$PASS" ]; then
+            echo "::warning::BACKUP_PASSPHRASE secret is not set - database NOT backed up, because an unencrypted dump would be downloadable from this public repository. Add BACKUP_PASSPHRASE to enable it."
+            echo "status=skipped (BACKUP_PASSPHRASE not set)" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          umask 077
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          cd scripts
+          npm install --no-audit --no-fund
+          node backup-firestore.mjs --key "$RUNNER_TEMP/sa.json" \
+            --out "$RUNNER_TEMP/backup/firestore/firestore-${{ steps.meta.outputs.date }}.json" | tee "$RUNNER_TEMP/db.log"
+          rm -f "$RUNNER_TEMP/sa.json"
+          echo "status=exported ($(head -1 "$RUNNER_TEMP/db.log" | sed -E 's/^Exported ([0-9]+) documents.*/\1 documents/'))" >> "$GITHUB_OUTPUT"
+          echo "encrypted=true" >> "$GITHUB_OUTPUT"
+
+      - name: Build the zip
+        env:
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          cd "$RUNNER_TEMP/backup"
+          {
+            echo "ROSMS backup ${{ steps.meta.outputs.date }}"
+            echo "Repository : ${{ github.repository }}"
+            echo "Commit     : ${{ github.sha }}"
+            echo "Created    : $(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M IST')"
+            echo "Database   : ${{ steps.db.outputs.status }}"
+            echo "See RESTORE.md for step-by-step restore instructions."
+          } > BACKUP-INFO.txt
+          ZIP="$RUNNER_TEMP/out/${{ steps.meta.outputs.name }}.zip"
+          if [ "${{ steps.db.outputs.encrypted }}" = "true" ]; then
+            # AES-256 zip: open with 7-Zip (Windows), Keka/The Unarchiver (Mac) or `7z x` (Linux).
+            7z a -tzip -mem=AES256 -mx=7 -p"$PASS" -bso0 -bsp0 "$ZIP" .
+          else
+            zip -qr -9 "$ZIP" .
+          fi
+          ls -lh "$ZIP"
+
+      - name: Keep the zip for 30 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.name }}
+          path: ${{ runner.temp }}/out/${{ steps.meta.outputs.name }}.zip
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Summary
+        run: |
+          {
+            echo "### ROSMS backup ${{ steps.meta.outputs.date }}"
+            echo "- Website source: included (commit \`${GITHUB_SHA::7}\`)"
+            echo "- Database: ${{ steps.db.outputs.status }}"
+            if [ "${{ steps.db.outputs.encrypted }}" = "true" ]; then echo "- Zip is AES-256 encrypted with BACKUP_PASSPHRASE"; fi
+            echo "- Download: this run's **Artifacts** section (kept 30 days). Restore steps: RESTORE.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove temporary files
+        if: ${{ always() }}
+        run: rm -rf "$RUNNER_TEMP/sa.json" "$RUNNER_TEMP/backup" "$RUNNER_TEMP/db.log"

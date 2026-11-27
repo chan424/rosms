@@ -14,6 +14,7 @@ import { accessibleModules, canManage, isSuperAdmin } from '../lib/permissions';
 import { MODULES } from '../config/modules';
 import { ROLE_LABELS, emailToUsername } from '../config/roles';
 import ModuleIcon from './ModuleIcon';
+import { palette, serif } from '../theme';
 
 const W = 272;
 
@@ -34,9 +35,9 @@ export default function Layout({ children }: { children: ReactNode }) {
   const sel = (path: string) => loc.pathname === path || (path !== '/' && loc.pathname.startsWith(path));
 
   const drawer = (
-    <Box sx={{ overflowY: 'auto' }}>
-      <Toolbar />
-      <List dense>
+    <Box sx={{ overflowY: 'auto', pb: 3 }}>
+      <Toolbar sx={{ minHeight: { xs: 64, md: 68 } }} />
+      <List dense sx={{ pt: 1.5 }}>
         <ListItemButton selected={sel('/')} onClick={() => go('/')}><ListItemIcon><DashboardIcon /></ListItemIcon><ListItemText primary="Dashboard" /></ListItemButton>
         <ListItemButton selected={sel('/me')} onClick={() => go('/me')}><ListItemIcon><PersonIcon /></ListItemIcon><ListItemText primary="My ROSMS" secondary="My outpasses & books" /></ListItemButton>
       </List>
@@ -44,7 +45,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <List dense key={g} subheader={<ListSubheader sx={{ lineHeight: '32px' }}>{g}</ListSubheader>}>
           {mods.filter((m) => m.group === g).map((m) => (
             <ListItemButton key={m.id} selected={sel(`/m/${m.id}`)} onClick={() => go(`/m/${m.id}`)}>
-              <ListItemIcon sx={{ color: m.color }}><ModuleIcon id={m.id} /></ListItemIcon>
+              <ListItemIcon sx={{ color: m.color, minWidth: 38 }}><ModuleIcon id={m.id} fontSize="small" /></ListItemIcon>
               <ListItemText primary={m.short} />
             </ListItemButton>
           ))}
@@ -66,17 +67,24 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <AppBar position="fixed" elevation={0} sx={{ zIndex: (th) => th.zIndex.drawer + 1, background: 'linear-gradient(90deg,#0d2d57,#15437f 60%,#1e5aa8)' }}>
-        <Toolbar>
+      <AppBar
+        position="fixed" elevation={0} color="inherit"
+        sx={{
+          zIndex: (th) => th.zIndex.drawer + 1, bgcolor: 'rgba(250,248,244,.92)', backdropFilter: 'saturate(1.2) blur(8px)',
+          color: palette.ink, borderBottom: `1px solid ${palette.border}`,
+          '&::before': { content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: 3, bgcolor: palette.maroon },
+        }}
+      >
+        <Toolbar sx={{ minHeight: { xs: 64, md: 68 } }}>
           {!desktop && <IconButton color="inherit" edge="start" onClick={() => setOpen(true)} sx={{ mr: 1 }}><MenuIcon /></IconButton>}
           <Box component="img" src={`${import.meta.env.BASE_URL}logo.svg`} alt="" sx={{ width: 34, height: 34, mr: 1.5 }} />
           <Box sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => go('/')}>
-            <Typography variant="h6" sx={{ lineHeight: 1.1, fontWeight: 800, letterSpacing: 0.5 }}>ROSMS</Typography>
-            <Typography variant="caption" sx={{ opacity: 0.85, display: { xs: 'none', sm: 'block' } }}>RGUKT Ongole Smart Management System · One campus, one system</Typography>
+            <Typography sx={{ fontFamily: serif, fontSize: 21, lineHeight: 1.05, fontWeight: 700, letterSpacing: '0.02em', color: palette.maroon }}>ROSMS</Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: { xs: 'none', sm: 'block' } }}>RGUKT Ongole · Smart Management System</Typography>
           </Box>
-          <Chip size="small" label={profile ? ROLE_LABELS[profile.role] : ''} sx={{ mr: 1, bgcolor: 'rgba(255,255,255,.15)', color: '#fff', display: { xs: 'none', sm: 'flex' } }} />
+          <Chip size="small" label={profile ? ROLE_LABELS[profile.role] : ''} sx={{ mr: 1, bgcolor: palette.ochreSoft, color: '#7A4E12', display: { xs: 'none', sm: 'flex' } }} />
           <IconButton onClick={(e) => setAnchor(e.currentTarget)}>
-            <Avatar sx={{ width: 34, height: 34, bgcolor: 'secondary.main' }}>{name.charAt(0).toUpperCase()}</Avatar>
+            <Avatar sx={{ width: 34, height: 34, bgcolor: palette.maroon, color: '#FAF8F4', fontFamily: serif, fontWeight: 600 }}>{name.charAt(0).toUpperCase()}</Avatar>
           </IconButton>
           <Menu anchorEl={anchor} open={!!anchor} onClose={() => setAnchor(null)}>
             <Box sx={{ px: 2, py: 1 }}>
@@ -93,14 +101,14 @@ export default function Layout({ children }: { children: ReactNode }) {
         variant={desktop ? 'permanent' : 'temporary'}
         open={desktop || open}
         onClose={() => setOpen(false)}
-        sx={{ width: W, flexShrink: 0, '& .MuiDrawer-paper': { width: W, boxSizing: 'border-box', borderRight: '1px solid #e3e8f1' } }}
+        sx={{ width: W, flexShrink: 0, '& .MuiDrawer-paper': { width: W, boxSizing: 'border-box', borderRight: `1px solid ${palette.border}`, bgcolor: palette.canvasSoft } }}
       >
         {drawer}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, width: { md: `calc(100% - ${W}px)` }, minWidth: 0 }}>
-        <Toolbar />
+      <Box component="main" sx={{ flexGrow: 1, px: { xs: 2, sm: 3, md: 4.5 }, py: { xs: 2, md: 3.5 }, maxWidth: 1480, mx: 'auto', width: { md: `calc(100% - ${W}px)` }, minWidth: 0 }}>
+        <Toolbar sx={{ minHeight: { xs: 64, md: 68 } }} />
         {children}
-        <Typography variant="caption" color="text.secondary" component="div" sx={{ textAlign: 'center', mt: 6 }}>
+        <Typography variant="caption" color="text.secondary" component="div" sx={{ textAlign: 'center', mt: 8, pt: 3, borderTop: `1px solid ${palette.border}` }}>
           © {new Date().getFullYear()} Rajiv Gandhi University of Knowledge Technologies, Ongole · ROSMS
         </Typography>
       </Box>

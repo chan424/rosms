@@ -8,7 +8,8 @@ secure place.
 
 - **Frontend:** React 18 + TypeScript + Vite + Material UI, hosted free on **GitHub Pages**
 - **Backend:** **Firebase** Authentication + Cloud Firestore (works on the free *Spark* plan)
-- **Security:** enforced on the server by [`firestore.rules`](firestore.rules) (covered by 53 automated rule tests in [`tests/`](tests))
+- **Security:** enforced on the server by [`firestore.rules`](firestore.rules) (covered by 91 automated rule tests in [`tests/`](tests)). Why a public repo is safe: [`SECURITY.md`](SECURITY.md)
+- **Backups:** a zip of the site + database every night at 01:30 IST — see [Daily backups](#daily-backups) and [`RESTORE.md`](RESTORE.md)
 
 ---
 
@@ -202,6 +203,20 @@ node manage-users.mjs --key ./serviceAccount.json enable  staff12
 ```
 Password resets need this script, because the free Spark plan has no server functions. Disabling, re-assigning and
 changing modules can all be done in the app.
+
+## Daily backups
+The **Daily backup** workflow ([`.github/workflows/daily-backup.yml`](.github/workflows/daily-backup.yml)) runs every
+night at 01:30 IST (and from **Actions → Daily backup → Run workflow**). It saves `rosms-backup-YYYY-MM-DD.zip` with the
+complete website source, a JSON export of the whole Firestore database and [`RESTORE.md`](RESTORE.md), kept for 30 days
+under the run's **Artifacts**.
+
+To include the database, add two repository **secrets**:
+- `FIREBASE_SERVICE_ACCOUNT` — the same service-account JSON the Seed workflow uses
+- `BACKUP_PASSPHRASE` — a long password you choose; the zip is then AES-256 encrypted (open it with 7-Zip)
+
+Because artifacts of a public repository can be downloaded by any GitHub user, the database is only exported when the
+zip can be encrypted. Without the secrets the run still succeeds with a code-only zip. Manual export / restore:
+`node scripts/backup-firestore.mjs` and `node scripts/restore-firestore.mjs` (see [`RESTORE.md`](RESTORE.md)).
 
 ## Local development
 ```bash

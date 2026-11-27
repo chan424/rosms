@@ -61,7 +61,10 @@ jobs:
         working-directory: scripts
         run: npm install --no-audit --no-fund
       - name: Publish Firestore rules and indexes
+        id: rules
         if: ${{ inputs.deploy_rules && !inputs.dry_run }}
+        # A rules failure (usually a missing IAM role on the key) must not block the logins and medicines.
+        continue-on-error: true
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
         run: |
@@ -78,6 +81,12 @@ jobs:
         if: ${{ inputs.seed_hospital }}
         working-directory: scripts
         run: node seed-hospital-stock.mjs --key "$RUNNER_TEMP/sa.json" ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Rules not published - what to do
+        if: ${{ steps.rules.outcome == 'failure' }}
+        run: |
+          echo "::warning::Rules/indexes were NOT published (the service account is missing a role). Logins and medicines were still processed. Fix: Google Cloud console > IAM > edit the firebase-adminsdk service account > add role 'Firebase Admin', then re-run with only 'Publish Firestore rules' ticked. Or paste firestore.rules in Firebase console > Firestore > Rules > Publish."
+          echo "### Rules were not published" >> "$GITHUB_STEP_SUMMARY"
+          echo "Add the **Firebase Admin** role to the firebase-adminsdk service account (Google Cloud console > IAM), then re-run with only *Publish Firestore rules* ticked." >> "$GITHUB_STEP_SUMMARY"
       - name: Remove credentials from the runner
         if: ${{ always() }}
         run: rm -f "$RUNNER_TEMP/sa.json" "$RUNNER_TEMP/users.csv"

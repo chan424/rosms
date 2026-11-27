@@ -71,6 +71,8 @@ service cloud.firestore {
     }
 
     function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    // A "who did it" field, when this write sets or changes it, must be the caller's own email.
+    function stampedByMe(f) { return !(f in changed()) || request.resource.data[f] == myEmail(); }
 
     // ---------- users ----------
     match /users/{uid} {
@@ -81,8 +83,10 @@ service cloud.firestore {
           && (request.resource.data.role != 'superadmin' || request.resource.data.email in superAdmins()))
         || (isInstitute() && request.auth.uid == uid
           && request.resource.data.email == myEmail()
+          && request.resource.data.keys().hasOnly(['email', 'displayName', 'role', 'modules', 'disabled',
+                                                    'mustChangePassword', 'createdAt', 'lastLoginAt'])
           && request.resource.data.role in ['student', 'faculty']
-          && request.resource.data.modules.size() == 0
+          && request.resource.data.modules is list && request.resource.data.modules.size() == 0
           && request.resource.data.disabled == false
           && request.resource.data.mustChangePassword == false);
 
@@ -92,6 +96,8 @@ service cloud.firestore {
         || (signedIn() && request.auth.uid == uid
           && changed().hasOnly(['mustChangePassword', 'lastLoginAt', 'displayName'])
           && (!('mustChangePassword' in changed()) || request.resource.data.mustChangePassword == false)
+          && (!('displayName' in changed()) || (request.resource.data.displayName is string
+                                                && request.resource.data.displayName.size() <= 100))
           && resource.data.get('disabled', false) != true);
 
       allow delete: if isSuperAdmin();
@@ -99,7 +105,8 @@ service cloud.firestore {
 
     // ---------- module settings (owners) ----------
     match /modules/{m} {
-      allow read: if isInstitute() || isStaffLogin();
+      // Only provisioned staff logins (an admin created their profile) may read module owners.
+      allow read: if isInstitute() || (isStaffLogin() && exists(userPath()));
       allow write: if isSuperAdmin();
     }
 
@@ -152,7 +159,8 @@ service cloud.firestore {
         && canEdit(request.resource.data.fromModule)
         && request.resource.data.status == 'pending'
         && request.resource.data.requestedBy == myEmail();
-      allow update: if changed().hasOnly(['status', 'decidedBy', 'decidedAt', 'decisionNote', 'closedAt']) && (
+      allow update: if changed().hasOnly(['status', 'decidedBy', 'decidedAt', 'decisionNote', 'closedAt'])
+        && stampedByMe('decidedBy') && (
            (resource.data.status == 'pending' && request.resource.data.status in ['accepted', 'rejected'] && canEdit(resource.data.toModule))
         || (resource.data.status == 'pending' && request.resource.data.status == 'cancelled' && canEdit(resource.data.fromModule))
         || (resource.data.status == 'rejected' && request.resource.data.status == 'returned' && canEdit(resource.data.fromModule))
@@ -175,7 +183,8 @@ service cloud.firestore {
         && request.resource.data.expectedReturn is timestamp;
       allow update: if canEdit('outpass') && resource.data.status == 'out'
         && request.resource.data.status in ['returned', 'cancelled']
-        && changed().hasOnly(['status', 'actualReturn', 'late', 'returnedMarkedBy', 'cancelledAt', 'cancelledBy']);
+        && changed().hasOnly(['status', 'actualReturn', 'late', 'returnedMarkedBy', 'cancelledAt', 'cancelledBy'])
+        && stampedByMe('returnedMarkedBy') && stampedByMe('cancelledBy');
       allow delete: if false;
     }
 

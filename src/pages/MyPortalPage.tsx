@@ -97,7 +97,7 @@ export default function MyPortalPage() {
               slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment> } }} />
             <Stack spacing={1}>
               {books.map((b) => (
-                <Stack key={b.id} direction="row" spacing={1} alignItems="center" sx={{ borderBottom: '1px solid #eee', py: 0.5 }}>
+                <Stack key={b.id} direction="row" spacing={1} alignItems="center" sx={{ borderBottom: '1px solid #EDE7DC', py: 0.5 }}>
                   <Typography variant="body2" sx={{ flexGrow: 1 }}><b>{b.title}</b> — {b.author} · {b.accessionNo} · Rack {b.rack || '—'}</Typography>
                   <Chip size="small" color={b.available > 0 ? 'success' : 'default'} label={b.available > 0 ? `${b.available} available` : 'All issued'} />
                 </Stack>

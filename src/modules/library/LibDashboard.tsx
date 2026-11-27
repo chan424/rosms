@@ -28,13 +28,13 @@ export default function LibDashboard() {
       {loading && <LinearProgress sx={{ mb: 2 }} />}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 6, md: 3 }}><StatCard label="Titles" value={books.length} icon={<MenuBookIcon />} /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Total copies" value={copies} icon={<LibraryBooksIcon />} color="#6a1b9a" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Available now" value={available} icon={<CheckCircleIcon />} color="#2e7d32" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Members" value={members.filter((m) => m.active).length} icon={<PeopleIcon />} color="#00838f" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Books issued" value={activeLoans.length} icon={<OutboxIcon />} color="#ef6c00" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Overdue" value={overdue.length} icon={<WarningIcon />} color="#c62828" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Fines (accruing + unpaid)" value={inr(accruing + unpaid)} icon={<CurrencyRupeeIcon />} color="#ad1457" hint={`${inr(settings.finePerDay)}/day`} /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Active reservations" value={reservations.length} icon={<BookmarkIcon />} color="#4527a0" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Total copies" value={copies} icon={<LibraryBooksIcon />} color="#6B3A5B" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Available now" value={available} icon={<CheckCircleIcon />} color="#1F6B48" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Members" value={members.filter((m) => m.active).length} icon={<PeopleIcon />} color="#2E6E6A" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Books issued" value={activeLoans.length} icon={<OutboxIcon />} color="#B5571E" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Overdue" value={overdue.length} icon={<WarningIcon />} color="#B42318" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Fines (accruing + unpaid)" value={inr(accruing + unpaid)} icon={<CurrencyRupeeIcon />} color="#8E2F4D" hint={`${inr(settings.finePerDay)}/day`} /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Active reservations" value={reservations.length} icon={<BookmarkIcon />} color="#57406E" /></Grid>
       </Grid>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>

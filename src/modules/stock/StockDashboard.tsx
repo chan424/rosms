@@ -28,13 +28,13 @@ export default function StockDashboard() {
     <>
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 6, md: 3 }}><StatCard label="Items" value={items.length} icon={<Inventory2Icon />} color={def.color} /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label={def.batches ? 'Out of stock / low' : 'Low stock'} value={def.batches ? `${outOfStock} / ${low.length - outOfStock}` : low.length} icon={<WarningIcon />} color="#c62828" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label={def.batches ? 'Out of stock / low' : 'Low stock'} value={def.batches ? `${outOfStock} / ${low.length - outOfStock}` : low.length} icon={<WarningIcon />} color="#B42318" /></Grid>
         {def.batches
-          ? <Grid size={{ xs: 6, md: 3 }}><StatCard label="Issues today" value={todayIssues.length} hint={`${new Set(todayIssues.map((t) => t.patientId || t.patientName)).size} patients`} icon={<MedicationIcon />} color="#2e7d32" /></Grid>
-          : <Grid size={{ xs: 6, md: 3 }}><StatCard label="Stock value" value={inr(value)} icon={<CurrencyRupeeIcon />} color="#2e7d32" /></Grid>}
+          ? <Grid size={{ xs: 6, md: 3 }}><StatCard label="Issues today" value={todayIssues.length} hint={`${new Set(todayIssues.map((t) => t.patientId || t.patientName)).size} patients`} icon={<MedicationIcon />} color="#1F6B48" /></Grid>
+          : <Grid size={{ xs: 6, md: 3 }}><StatCard label="Stock value" value={inr(value)} icon={<CurrencyRupeeIcon />} color="#1F6B48" /></Grid>}
         {def.batches
-          ? <Grid size={{ xs: 6, md: 3 }}><StatCard label={`Batches expiring ≤ ${EXPIRY_WARN_DAYS} days`} value={expiring} icon={<EventBusyIcon />} color="#ef6c00" /></Grid>
-          : <Grid size={{ xs: 6, md: 3 }}><StatCard label="Incoming transfers" value={pending} icon={<SwapHorizIcon />} color="#4527a0" /></Grid>}
+          ? <Grid size={{ xs: 6, md: 3 }}><StatCard label={`Batches expiring ≤ ${EXPIRY_WARN_DAYS} days`} value={expiring} icon={<EventBusyIcon />} color="#B5571E" /></Grid>
+          : <Grid size={{ xs: 6, md: 3 }}><StatCard label="Incoming transfers" value={pending} icon={<SwapHorizIcon />} color="#57406E" /></Grid>}
       </Grid>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 7 }}>

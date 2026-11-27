@@ -1,6 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1e5aa8"/><stop offset="1" stop-color="#0d2d57"/></linearGradient></defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <path d="M32 9 52 18v14c0 11-8.5 19.5-20 23C20.5 51.5 12 43 12 32V18z" fill="none" stroke="#f39c12" stroke-width="3"/>
-  <text x="32" y="40" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="800" fill="#fff">RO</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ROSMS">
+  <rect width="64" height="64" rx="14" fill="#7A1F2B"/>
+  <rect x="3" y="3" width="58" height="58" rx="11.5" fill="none" stroke="#B87D2B" stroke-opacity=".55" stroke-width="1.5"/>
+  <path d="M32 12 50 19.5v12.3C50 42.4 42.6 50 32 53 21.4 50 14 42.4 14 31.8V19.5z" fill="#5E1620" stroke="#D3A15A" stroke-width="2"/>
+  <path d="M22 26.5c3.6-1.2 7-1.1 10 .6 3-1.7 6.4-1.8 10-.6v13c-3.6-1.2-7-1.1-10 .6-3-1.7-6.4-1.8-10-.6z" fill="#FAF8F4"/>
+  <path d="M32 27.1v13.1" stroke="#7A1F2B" stroke-width="1.4"/>
+  <circle cx="32" cy="19.5" r="2.2" fill="#D3A15A"/>
 </svg>

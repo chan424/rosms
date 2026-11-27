@@ -6,7 +6,9 @@
   "scripts": {
     "seed": "node seed-users.mjs",
     "manage": "node manage-users.mjs",
-    "seed:hospital": "node seed-hospital-stock.mjs"
+    "seed:hospital": "node seed-hospital-stock.mjs",
+    "backup": "node backup-firestore.mjs",
+    "restore": "node restore-firestore.mjs"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0",

@@ -5,6 +5,7 @@ import { accessibleModules, isOwner, isSuperAdmin } from '../lib/permissions';
 import { ROLE_LABELS, emailToUsername } from '../config/roles';
 import ModuleIcon from '../components/ModuleIcon';
 import PageHeader from '../components/PageHeader';
+import { palette } from '../theme';
 
 export default function DashboardPage() {
   const auth = useAuth();
@@ -30,31 +31,37 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <Grid container spacing={2}>
-          {mods.map((m) => (
-            <Grid key={m.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-              <Card sx={{ height: '100%', borderTop: 4, borderTopColor: m.color }}>
-                <CardActionArea sx={{ height: '100%' }} onClick={() => nav(`/m/${m.id}`)}>
-                  <CardContent>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Box sx={{ width: 48, height: 48, borderRadius: 2, display: 'grid', placeItems: 'center', bgcolor: m.color + '1a', color: m.color }}>
-                        <ModuleIcon id={m.id} />
-                      </Box>
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="subtitle1" fontWeight={700}>{m.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">{m.description}</Typography>
-                      </Box>
-                    </Stack>
-                    <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
-                      <Chip size="small" label={m.group} variant="outlined" />
-                      {isOwner(auth, m.id) && <Chip size="small" color="primary" label="Owner" />}
-                    </Stack>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
+        <Stack spacing={4}>
+          {Array.from(new Set(mods.map((m) => m.group))).map((g) => (
+            <Box key={g}>
+              <Typography variant="overline" sx={{ color: palette.stoneLight, display: 'block', mb: 1.25 }}>{g}</Typography>
+              <Grid container spacing={2}>
+                {mods.filter((m) => m.group === g).map((m) => (
+                  <Grid key={m.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                    <Card sx={{ height: '100%', transition: 'border-color .15s, box-shadow .15s, transform .15s', '&:hover': { borderColor: palette.borderStrong, boxShadow: '0 6px 22px rgba(31,27,24,.07)', transform: 'translateY(-1px)' } }}>
+                      <CardActionArea sx={{ height: '100%' }} onClick={() => nav(`/m/${m.id}`)}>
+                        <CardContent sx={{ p: 2.5 }}>
+                          <Stack direction="row" spacing={1.75} alignItems="flex-start">
+                            <Box sx={{ width: 40, height: 40, flexShrink: 0, borderRadius: 2, display: 'grid', placeItems: 'center', bgcolor: m.color + '14', color: m.color, border: `1px solid ${m.color}26` }}>
+                              <ModuleIcon id={m.id} fontSize="small" />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>{m.name}</Typography>
+                                {isOwner(auth, m.id) && <Chip size="small" label="Owner" sx={{ height: 20, fontSize: 11, bgcolor: palette.ochreSoft, color: '#7A4E12' }} />}
+                              </Stack>
+                              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, lineHeight: 1.55 }}>{m.description}</Typography>
+                            </Box>
+                          </Stack>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Stack>
       )}
     </>
   );

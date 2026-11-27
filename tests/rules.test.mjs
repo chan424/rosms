@@ -107,6 +107,42 @@ await t('library owner writes settings', assertSucceeds(setDoc(doc(lib, 'library
 const dis = ctx('dis', P('staff05'));
 await t('disabled user blocked', assertFails(getDocs(collection(dis, 'stock/cse/items'))));
 
+// ---------- hardening checks (public-repo safety) ----------
+const anon = env.unauthenticatedContext().firestore();
+for (const path of ['users/ao', 'modules/cse', 'library_books/A1', 'stock/cse/items/PEN', 'outpasses/op1', 'students/o234747@rguktong.ac.in', 'library_settings/config']) {
+  await t(`anonymous cannot read ${path}`, assertFails(getDoc(doc(anon, path))));
+}
+for (const c of ['users', 'audit', 'transfers', 'library_members', 'library_loans', 'stock/hospital/txns']) {
+  await t(`anonymous cannot list ${c}`, assertFails(getDocs(collection(anon, c))));
+}
+await t('anonymous cannot write books', assertFails(setDoc(doc(anon, 'library_books/Z'), { title: 'x', copies: 1, available: 1 })));
+await t('anonymous cannot write users', assertFails(setDoc(doc(anon, 'users/zz'), { email: 'x@rguktong.ac.in', role: 'superadmin', modules: [], disabled: false, mustChangePassword: false })));
+await t('gmail cannot write stock', assertFails(setDoc(doc(gmail, 'stock/cse/items/X'), { name: 'X', quantity: 1 })));
+await t('gmail cannot list users', assertFails(getDocs(collection(gmail, 'users'))));
+const fakeAdmin = ctx('fa', { email: 'ao@rguktong.ac.in', email_verified: false, firebase: { sign_in_provider: 'google.com' } });
+await t('unverified super-admin email is not admin', assertFails(getDocs(collection(fakeAdmin, 'users'))));
+await t('unprovisioned staff cannot read module owners', assertFails(getDoc(doc(rogue, 'modules/cse'))));
+const newStu4 = ctx('s4', G('o777777@rguktong.ac.in'));
+await t('self-register cannot smuggle extra fields', assertFails(setDoc(doc(newStu4, 'users/s4'), { email: 'o777777@rguktong.ac.in', role: 'student', modules: [], disabled: false, mustChangePassword: false, isAdmin: true })));
+await t('student cannot edit another user', assertFails(updateDoc(doc(stu, 'users/warden1'), { displayName: 'x' })));
+await t('student cannot read another user', assertFails(getDoc(doc(stu, 'users/warden1'))));
+await t('student cannot read other students doc', assertFails(getDoc(doc(stu, 'students/o111111@rguktong.ac.in'))));
+await t('student cannot issue outpass', assertFails(setDoc(doc(stu, 'outpasses/op9'), { studentEmail: 'o234747@rguktong.ac.in', status: 'out', issuedBy: 'o234747@rguktong.ac.in', reason: 'x', expectedReturn: Timestamp.now() })));
+await t('student cannot read hospital stock', assertFails(getDocs(collection(stu, 'stock/hospital/items'))));
+await t('warden cannot read stock', assertFails(getDocs(collection(warden, 'stock/cse/items'))));
+await t('warden cannot change own modules', assertFails(updateDoc(doc(warden, 'users/warden1'), { modules: ['outpass', 'hospital'] })));
+await t('warden cannot re-enable / edit other user', assertFails(updateDoc(doc(warden, 'users/dis'), { disabled: false })));
+await t('warden cannot forge returnedMarkedBy', assertFails(updateDoc(doc(warden, 'outpasses/op2'), { status: 'returned', returnedMarkedBy: 'ao@rguktong.ac.in' })));
+await t('warden marks returned stamped by self', assertSucceeds(updateDoc(doc(warden, 'outpasses/op2'), { status: 'returned', returnedMarkedBy: 'warden01@rosms.local' })));
+await t('hod.cse cannot write central stock', assertFails(setDoc(doc(hodStaff, 'stock/central/items/X'), { name: 'X', quantity: 1 })));
+await t('hod.cse cannot write library', assertFails(updateDoc(doc(hodStaff, 'library_books/A1'), { available: 1 })));
+await t('hod.cse cannot read users list', assertFails(getDocs(collection(hodStaff, 'users'))));
+await t('hod.cse cannot edit ledger', assertFails(setDoc(doc(hodStaff, 'stock/cse/txns/forged'), { type: 'in', qty: 1, by: 'ao@rguktong.ac.in' })));
+await t('hod.cse cannot write module owners', assertFails(setDoc(doc(hodStaff, 'modules/cse'), { owners: ['hod.cse@rosms.local'] })));
+await t('hod.cse creates transfer t2', assertSucceeds(setDoc(doc(hodStaff, 'transfers/t2'), { fromModule: 'cse', toModule: 'central', itemId: 'PEN', qty: 1, status: 'pending', requestedBy: 'hod.cse@rosms.local', createdAt: serverTimestamp() })));
+await t('central cannot forge decidedBy', assertFails(updateDoc(doc(central, 'transfers/t2'), { status: 'rejected', decidedBy: 'ao@rguktong.ac.in' })));
+await t('audit log cannot be edited', assertFails(updateDoc(doc(admin, 'audit/any'), { action: 'x' })));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

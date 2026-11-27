@@ -97,7 +97,7 @@ export default function Dispense() {
             <Typography variant="h6" gutterBottom>Recent issues {recentForPatient.length ? `to ${pid.toUpperCase()}` : ''}</Typography>
             {pid.trim().length >= 3 && recentForPatient.length === 0 && <Alert severity="info">No earlier issues for {pid.toUpperCase()} in recent records.</Alert>}
             {(recentForPatient.length ? recentForPatient : txns.filter((t) => t.type === 'out').slice(0, 8)).map((t) => (
-              <Stack key={t.id} sx={{ py: 1, borderBottom: '1px solid #eee' }}>
+              <Stack key={t.id} sx={{ py: 1, borderBottom: '1px solid #EDE7DC' }}>
                 <Typography variant="body2"><b>{t.itemName}</b> × {t.qty} {t.unit}</Typography>
                 <Typography variant="caption" color="text.secondary">{fmtDateTime(t.at)} · {t.party || '—'}{t.complaint ? ` · ${t.complaint}` : ''}</Typography>
                 <Chip size="small" variant="outlined" label={`by ${t.by.split('@')[0]}`} sx={{ alignSelf: 'flex-start', mt: 0.5 }} />

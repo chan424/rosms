@@ -47,10 +47,10 @@ export default function Board({ open, recent, loading }: { open: Outpass[]; rece
   return (
     <>
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Currently out of campus" value={open.length} icon={<DirectionsWalkIcon />} color="#00695c" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Late (past expected return)" value={late.length} icon={<WarningIcon />} color="#c62828" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Outpasses issued today" value={issuedToday} icon={<TodayIcon />} color="#1e5aa8" /></Grid>
-        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Returned today" value={returnedToday} icon={<KeyboardReturnIcon />} color="#2e7d32" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Currently out of campus" value={open.length} icon={<DirectionsWalkIcon />} color="#2D5F55" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Late (past expected return)" value={late.length} icon={<WarningIcon />} color="#B42318" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Outpasses issued today" value={issuedToday} icon={<TodayIcon />} color="#34506B" /></Grid>
+        <Grid size={{ xs: 6, md: 3 }}><StatCard label="Returned today" value={returnedToday} icon={<KeyboardReturnIcon />} color="#1F6B48" /></Grid>
       </Grid>
       <DataTable title="Students out of campus" rows={open} columns={columns} loading={loading} exportName="students-out-of-campus" dense initialSort={{ key: 'expectedReturn', dir: 'asc' }}
         emptyText="All registered students are in campus." />
